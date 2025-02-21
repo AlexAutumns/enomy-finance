@@ -2,26 +2,25 @@ package com.enomyfinance.system.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
-@Table(name = "audit_logs")
+@Table(name = "audit_log")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class AuditLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "logId")
     private Long logId;
+
     private String eventDetails;
     private String eventType;
     private LocalDateTime timestamp;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "userId", referencedColumnName = "userId")
     private User user;
 }

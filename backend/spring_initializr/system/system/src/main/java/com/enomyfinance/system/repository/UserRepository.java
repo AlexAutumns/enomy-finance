@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Optional;
 import java.time.LocalDateTime;
 
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
@@ -15,4 +18,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     boolean existsByEmail(String email);
     void deleteByEmail(String email);
     List<User> findByNameContainingIgnoreCase(String name);
+
+    @Query("SELECT u FROM User u WHERE u.userId IN :ids")
+    List<User> findUsersBySystemSettings(@Param("ids") List<Long> activeSystemSettingsIDs);
 }
