@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/currencies")
+@CrossOrigin
 public class CurrencyController {
     @Autowired
     private CurrencyService currencyService;

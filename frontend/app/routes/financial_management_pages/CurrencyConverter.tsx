@@ -8,67 +8,101 @@ const CurrencyConverter = () => {
     const [amount, setAmount] = useState(1);
     const [convertedAmount, setConvertedAmount] = useState(0);
 
-    useEffect(() => {
-        const fetchCurrencies = async () => {
+    const fetchCurrencies = async () => {
+        try {
             const response = await axios.get(
-                "https://api.exchangerate-api.com/v4/latest/GBP"
+                "http://localhost:8080/currencies"
             );
-            setCurrencies(Object.keys(response.data.rates));
-        };
+            setCurrencies(response.data);
+            console.log(response.data)
+        } catch (error) {
+            console.error("Error fetching currencies:", error);
+        }
+    };
+
+    const calculateConversion = () => {
+        const fromCurrencyObj = currencies.find(
+            (currency) => currency.currencyCode === fromCurrency
+        );
+        const toCurrencyObj = currencies.find(
+            (currency) => currency.currency_code === toCurrency
+        );
+
+        const fromRate = fromCurrencyObj ? fromCurrencyObj.exchangeRate : 1;
+        const toRate = toCurrencyObj ? toCurrencyObj.exchangeRate : 1;
+
+        const exchangeRateFromToCurrency = toRate / fromRate;
+        const result = amount * exchangeRateFromToCurrency;
+        setConvertedAmount(result);
+    };
+
+    useEffect(() => {
         fetchCurrencies();
     }, []);
 
     useEffect(() => {
-        const fetchConversion = async () => {
-            const response = await axios.get(
-                `https://api.exchangerate-api.com/v4/latest/${fromCurrency}`
-            );
-            const rate = response.data.rates[toCurrency];
-            setConvertedAmount((amount * rate).toFixed(2));
-        };
-        fetchConversion();
-    }, [fromCurrency, toCurrency, amount]);
+        if (currencies.length > 0) {
+            calculateConversion();
+        }
+    }, [amount, fromCurrency, toCurrency, currencies]);
 
     return (
-        <div className="p-6 bg-gray-100">
+        <div className="container mx-auto p-6">
             <div className="mb-4">
-                <h1 className="text-2xl font-bold mb-4">Currency Converter</h1>
-                <input
-                    type="number"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
-                    className="border p-2"
-                />
-                <select
-                    value={fromCurrency}
-                    onChange={(e) => setFromCurrency(e.target.value)}
-                    className="border p-2 ml-2"
-                >
-                    {currencies.map((currency) => (
-                        <option key={currency} value={currency}>
-                            {currency}
-                        </option>
-                    ))}
-                </select>
-                <span className="mx-2">to</span>
-                <select
-                    value={toCurrency}
-                    onChange={(e) => setToCurrency(e.target.value)}
-                    className="border p-2"
-                >
-                    {currencies.map((currency) => (
-                        <option key={currency} value={currency}>
-                            {currency}
-                        </option>
-                    ))}
-                </select>
+                <h1 className="text-2xl font-bold mb-4 text-center">
+                    Currency Converter
+                </h1>
+                <div className="flex items-center justify-center mb-4">
+                    <div className="flex border-2 rounded-2xl">
+                        <input
+                            type="number"
+                            value={amount}
+                            onChange={(e) => setAmount(e.target.value)}
+                            className="p-2 w-sm text-center rounded-l-2xl"
+                        />
+                        <select
+                            value={fromCurrency}
+                            onChange={(e) => setFromCurrency(e.target.value)}
+                            className="border-l-4 border-double rounded-r-2xl p-2 w-24 text-center"
+                        >
+                            {currencies.map((currency) => (
+                                <option
+                                    key={currency.currencyID}
+                                    value={currency.currencyCode}
+                                >
+                                    {currency.currencyCode}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
 
-                <h2 className="text-xl">
-                    Converted Amount: {convertedAmount} {toCurrency}
+                    <span className="mx-2 text-lg">to</span>
+                    <select
+                        value={toCurrency}
+                        onChange={(e) => setToCurrency(e.target.value)}
+                        className="border-2 p-2 rounded-2xl w-24 text-center"
+                    >
+                        {currencies.map((currency) => (
+                            <option
+                                key={currency.currencyId}
+                                value={currency.currencyCode}
+                            >
+                                {currency.currencyCode}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <h2 className="text-xl text-center">
+                    Converted Amount:{" "}
+                    <span className="font-bold">
+                        {convertedAmount.toLocaleString(undefined, {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                        })}{" "}
+                        {toCurrency}
+                    </span>
                 </h2>
-            </div>
-            <div>
-                {/* Charts */}
             </div>
         </div>
     );

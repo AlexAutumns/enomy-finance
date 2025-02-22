@@ -10,7 +10,7 @@ export default [
     route("register", "routes/authentication_pages/register.tsx"),
 
     // User Pages
-
+    route("profile", "routes/user_pages/Profile.tsx"),
 
     // Financial Management Pages
     route("currency-converter", "routes/financial_management_pages/CurrencyConverter.tsx"),

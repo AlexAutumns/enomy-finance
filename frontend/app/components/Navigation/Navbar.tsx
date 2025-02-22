@@ -21,7 +21,7 @@ function AuthButtons({ isLoggedIn }) {
 
 export default function MyAppNav() {
     // Example state to track login status
-    const [isLoggedIn, setIsLoggedIn] = useState(true) // Change this to be based on authentication logic
+    const [isLoggedIn, setIsLoggedIn] = useState(false); // Change this to be based on authentication logic
 
     return (
         <div className="flex justify-between items-center p-4 bg-gray-800 text-white">
@@ -33,17 +33,25 @@ export default function MyAppNav() {
             </NavLink>
             <div className="flex items-center space-x-15">
                 <nav className="flex space-x-5">
-                    <NavLink to="/">Home</NavLink>
-                    <NavLink to="/currency-converter">
-                        Currency Converter
+                    <NavLink to="/">
+                        <span className="hover:text-[#BBE1FA]">Home</span>
                     </NavLink>
-                    <NavLink to="/transactions">Transactions</NavLink>
+                    <NavLink to="/currency-converter">
+                        <span className="hover:text-[#BBE1FA]">
+                            Currency Converter
+                        </span>
+                    </NavLink>
+                    <NavLink to="/transactions">
+                        <span className="hover:text-[#BBE1FA]">
+                            Transactions
+                        </span>
+                    </NavLink>
                 </nav>
                 {/* Use the AuthButtons component */}
                 {!isLoggedIn ? (
                     <AuthButtons isLoggedIn={isLoggedIn} />
                 ) : (
-                    <NavLink to="/Account">
+                    <NavLink to="/profile">
                         <span className="bg-[#3282B8] text-white py-2 px-4 rounded-full">
                             Account
                         </span>

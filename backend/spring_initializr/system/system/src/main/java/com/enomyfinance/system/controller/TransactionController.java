@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/transactions")
+@CrossOrigin
 public class TransactionController {
 
     @Autowired

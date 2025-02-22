@@ -12,6 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/audit-logs")
+@CrossOrigin
 public class AuditLogController {
     @Autowired
     private AuditLogService auditLogService;

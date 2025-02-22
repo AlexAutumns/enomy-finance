@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/system-settings")
+@CrossOrigin
 public class SystemSettingController {
     @Autowired
     private SystemSettingService systemSettingService;
