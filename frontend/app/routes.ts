@@ -13,7 +13,14 @@ export default [
     route("profile", "routes/user_pages/Profile.tsx"),
 
     // Financial Management Pages
-    route("currency-converter", "routes/financial_management_pages/CurrencyConverter.tsx"),
+    route(
+        "currency-converter",
+        "routes/financial_management_pages/CurrencyConverter.tsx"
+    ),
+    route(
+        "investment-plan-calculator",
+        "routes/financial_management_pages/investment_plan_calculator/InvestmentPlanCalculator.tsx"
+    ),
 
     // Settings
 ] satisfies RouteConfig;

@@ -3,6 +3,9 @@ package com.enomyfinance.system.model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.text.DateFormat;
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Setter
@@ -19,9 +22,10 @@ public class Investment {
     private String currencyCode;
     private Double initialLumpSum;
     private Double monthlyInvestment;
-    private Double totalFees;
-    private Double totalTaxes;
+    private Double[] yearlyFees;
+    private Double[] yearlyTaxes;
     private Double expectedMaxReturn;
+    private LocalDateTime timestamp;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

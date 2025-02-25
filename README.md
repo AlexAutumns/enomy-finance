@@ -28,7 +28,7 @@ An application that has tools for financial calculations and analysis.
    - `Estimated Tax` : **10% for Profits above £12 000**
    - `RBSX Group Fees / Month` : **0.25%**
 
-  #### Savings Plan Plus
+  #### Managed Stock Investments
    - `Maximum Investment / Year`  : **Unlimited**
    - `Minimum Monthly Investment` : **£150**
    - `Minimum initial investment lump sum` : **£1000**

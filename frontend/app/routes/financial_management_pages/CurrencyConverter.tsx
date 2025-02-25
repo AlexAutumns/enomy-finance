@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import calculateCurrencyConversion from "../../components/calculation/CalculateCurrencyConversion.js";
+import { FaExchangeAlt } from "react-icons/fa";
 
 const CurrencyConverter = () => {
     const [currencies, setCurrencies] = useState([]);
@@ -8,66 +10,62 @@ const CurrencyConverter = () => {
     const [amount, setAmount] = useState(1);
     const [convertedAmount, setConvertedAmount] = useState(0);
 
-    const fetchCurrencies = async () => {
-        try {
-            const response = await axios.get(
-                "http://localhost:8080/currencies"
-            );
-            setCurrencies(response.data);
-            console.log(response.data)
-        } catch (error) {
-            console.error("Error fetching currencies:", error);
-        }
-    };
-
-    const calculateConversion = () => {
-        const fromCurrencyObj = currencies.find(
-            (currency) => currency.currencyCode === fromCurrency
-        );
-        const toCurrencyObj = currencies.find(
-            (currency) => currency.currency_code === toCurrency
-        );
-
-        const fromRate = fromCurrencyObj ? fromCurrencyObj.exchangeRate : 1;
-        const toRate = toCurrencyObj ? toCurrencyObj.exchangeRate : 1;
-
-        const exchangeRateFromToCurrency = toRate / fromRate;
-        const result = amount * exchangeRateFromToCurrency;
-        setConvertedAmount(result);
-    };
-
     useEffect(() => {
+        const fetchCurrencies = async () => {
+            try {
+                const response = await axios.get(
+                    "http://localhost:8080/currencies"
+                );
+                setCurrencies(response.data);
+            } catch (error) {
+                console.error("Error fetching currencies:", error);
+            }
+        };
         fetchCurrencies();
     }, []);
 
     useEffect(() => {
         if (currencies.length > 0) {
-            calculateConversion();
+            setConvertedAmount(
+                calculateCurrencyConversion(
+                    currencies,
+                    fromCurrency,
+                    toCurrency,
+                    amount
+                )
+            );
         }
     }, [amount, fromCurrency, toCurrency, currencies]);
 
+    const swapCurrencies = () => {
+        setFromCurrency(toCurrency);
+        setToCurrency(fromCurrency);
+    };
+
     return (
-        <div className="container mx-auto p-6">
-            <div className="mb-4">
-                <h1 className="text-2xl font-bold mb-4 text-center">
-                    Currency Converter
-                </h1>
-                <div className="flex items-center justify-center mb-4">
-                    <div className="flex border-2 rounded-2xl">
+        <div className="w-[60%] mx-auto p-6 bg-white rounded-xl">
+            <h1 className="text-3xl font-bold text-center mb-6">
+                Currency Converter
+            </h1>
+
+            <div className="flex flex-col items-center justify-center gap-4 w-full">
+                <div className="flex items-center space-x-10">
+                    <div className="flex items-center bg-gray-100 rounded-lg shadow-sm">
                         <input
                             type="number"
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
-                            className="p-2 w-sm text-center rounded-l-2xl"
+                            className="p-3 w-32 text-center bg-transparent outline-none rounded-l-lg"
+                            min="0"
                         />
                         <select
                             value={fromCurrency}
                             onChange={(e) => setFromCurrency(e.target.value)}
-                            className="border-l-4 border-double rounded-r-2xl p-2 w-24 text-center"
+                            className="p-3 text-center border-l-2 bg-white rounded-r-lg cursor-pointer"
                         >
                             {currencies.map((currency) => (
                                 <option
-                                    key={currency.currencyID}
+                                    key={currency.currencyId}
                                     value={currency.currencyCode}
                                 >
                                     {currency.currencyCode}
@@ -76,11 +74,17 @@ const CurrencyConverter = () => {
                         </select>
                     </div>
 
-                    <span className="mx-2 text-lg">to</span>
+                    <button
+                        onClick={swapCurrencies}
+                        className="p-3 bg-blue-500 text-white rounded-full shadow-md hover:bg-blue-600 transition-all"
+                    >
+                        <FaExchangeAlt className="text-xl" />
+                    </button>
+
                     <select
                         value={toCurrency}
                         onChange={(e) => setToCurrency(e.target.value)}
-                        className="border-2 p-2 rounded-2xl w-24 text-center"
+                        className="p-3 text-center border-2 bg-white rounded-lg cursor-pointer"
                     >
                         {currencies.map((currency) => (
                             <option
@@ -93,9 +97,9 @@ const CurrencyConverter = () => {
                     </select>
                 </div>
 
-                <h2 className="text-xl text-center">
+                <h2 className="text-xl text-center p-3 rounded-lg font-semibold">
                     Converted Amount:{" "}
-                    <span className="font-bold">
+                    <span className="text-blue-500">
                         {convertedAmount.toLocaleString(undefined, {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,

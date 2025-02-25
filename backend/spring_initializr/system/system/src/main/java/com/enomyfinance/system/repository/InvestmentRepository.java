@@ -11,6 +11,4 @@ import java.time.LocalDateTime;
 public interface InvestmentRepository extends JpaRepository<Investment, Long> {
     List<Investment> findByUser_UserId(Long userId);
     List<Investment> findByInvestmentType(String investmentType);
-    List<Investment> findByTotalFeesLessThan(Double maxFees);
-    List<Investment> findByExpectedMaxReturnGreaterThan(Double returnRate);
 }

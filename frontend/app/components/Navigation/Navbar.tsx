@@ -24,7 +24,7 @@ export default function MyAppNav() {
     const [isLoggedIn, setIsLoggedIn] = useState(false); // Change this to be based on authentication logic
 
     return (
-        <div className="flex justify-between items-center p-4 bg-gray-800 text-white">
+        <div className="top-0 sticky w-full not-only-of-type:flex justify-between items-center p-4 bg-gray-800 text-white">
             <NavLink to="/" className="flex items-center text-3xl">
                 <span className="text-[#3282B8] font-bold">Enomy</span>
                 <span className="text-[#BBE1FA] font-bold font-SpaceGrotesk">
@@ -36,11 +36,19 @@ export default function MyAppNav() {
                     <NavLink to="/">
                         <span className="hover:text-[#BBE1FA]">Home</span>
                     </NavLink>
+
                     <NavLink to="/currency-converter">
                         <span className="hover:text-[#BBE1FA]">
                             Currency Converter
                         </span>
                     </NavLink>
+
+                    <NavLink to="/investment-plan-calculator">
+                        <span className="hover:text-[#BBE1FA]">
+                            Investment Plan Calculator
+                        </span>
+                    </NavLink>
+
                     <NavLink to="/transactions">
                         <span className="hover:text-[#BBE1FA]">
                             Transactions
