@@ -1,8 +1,12 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
+import InvestmentInputs from "./InvestmentInputs.tsx";
+import InvestmentResults from "./InvestmentResults.tsx";
+
 import calculateCurrencyConversion from "../../../components/calculation/CalculateCurrencyConversion.js";
 import calculateInvestmentPlan from "../../../components/calculation/InvestmentPlanCalculator/calculateInvestmentPlan.js";
+import { data } from "react-router";
 
 const InvestmentPlanCalculator = () => {
     const investmentsData = [
@@ -84,13 +88,12 @@ const InvestmentPlanCalculator = () => {
     const [yearlyBalanceAfterTaxAndFees, setYearlyBalanceAfterTaxAndFees] =
         useState([0]);
 
-    const [yearlyProfits, setYearlyProfits] = useState([0]);
     const [yearlyFees, setYearlyFees] = useState([0]);
     const [yearlyTaxes, setYearlyTaxes] = useState([0]);
 
     // Settings
     const [totalResultsYear, setTotalResultsYear] = useState(1);
-    const [calculatedYears, setCalculatedYears] = useState(10);
+    const [calculatedYears, setCalculatedYears] = useState(30);
 
     // Toggles
 
@@ -116,7 +119,7 @@ const InvestmentPlanCalculator = () => {
         try {
             let result = {};
             // Always use 10 years if totalResultsYear is less than or equal to 10
-            const yearsToUse = totalResultsYear <= 10 ? 10 : totalResultsYear;
+            const yearsToUse = totalResultsYear <= calculatedYears ? calculatedYears : totalResultsYear;
             result = calculateInvestmentPlan(
                 currencies,
                 toCurrency,
@@ -156,6 +159,12 @@ const InvestmentPlanCalculator = () => {
         }
     }, [totalResultsYear - 1]);
 
+    useEffect(() => {
+        try {
+            handleCalculation();
+        } catch (e) {}
+    }, [calculatedYears]);
+
     return (
         <div className="container mx-auto py-6 flex flex-col items-center justify-center">
             <h1 className="text-3xl font-bold mb-4 text-center">
@@ -169,17 +178,17 @@ const InvestmentPlanCalculator = () => {
                         {investments.map((inv) => (
                             <li
                                 key={inv.type}
-                                className={`flex flex-col gap-4 border-2 rounded-2xl min-w-[20%] shadow-lg  p-4 items-center transition-all duration-300 ease-in-out ${
+                                className={`flex flex-col gap-4 border-2 rounded-2xl min-w-[20%] shadow-lg p-4 items-center transition-all duration-300 ease-in-out ${
                                     selectedInvestment?.type === inv.type
                                         ? "shadow-lg inset-shadow-sky-200 scale-[1.02] bg-[#d3ecfc]"
-                                        : "bg-white  hover:shadow-xl hover:scale-[1.02]"
+                                        : "bg-white hover:shadow-xl hover:scale-[1.02]"
                                 }`}
                             >
                                 <h2 className="font-bold text-lg text-center">
                                     {inv.name}
                                 </h2>
 
-                                <div className="flex w-full flex-col items-center gap-2  ">
+                                <div className="flex w-full flex-col items-center gap-2 ">
                                     <button
                                         className="bg-[#3282B8] hover:bg-[#0F4C75] text-white font-bold w-full py-2 px-3 rounded-full transition-all duration-300"
                                         onClick={() => toggleDetails(inv.type)}
@@ -407,14 +416,14 @@ const InvestmentPlanCalculator = () => {
                             className="bg-gray-500 hover:bg-gray-700 text-white py-2 px-4 rounded-full w-1/4"
                             onClick={() => {
                                 setTotalResultsYear(1);
-                                setCalculatedYears(10);
+                                setCalculatedYears(30);
                                 handleCalculation();
                             }}
                         >
                             Calculate
                         </button>
 
-                        {/* Save Button  (This should only be loaded in if logged in*/}
+                        {/* Save Button (This should only be loaded in if logged in*/}
                         <button
                             className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded-full w-1/4"
                             onClick={() => {}}
@@ -424,122 +433,17 @@ const InvestmentPlanCalculator = () => {
                     </div>
                 </div>
 
-                {/* Results Section */}
-                <div>
-                    <h2 className="font-bold mb-2 text-2xl pb-2 w-full text-center">
-                        Results
-                    </h2>
-                    <div className="flex flex-col items-center border-2 rounded-2xl p-4 gap-6 shadow-xl">
-                        <div className="flex w-full justify-center">
-                            {/* To Be Added */}
-                            Graph Placeholder
-                        </div>
-
-                        <div className="border-t-2 w-full border-black"></div>
-
-                        <div className="flex flex-col w-[80%] gap-4">
-                            {/* Year Select */}
-                            <div className="flex items-center gap-2">
-                                <label className="mb-1 font-bold text-lg">
-                                    Year
-                                </label>
-                                <input
-                                    type="number"
-                                    value={totalResultsYear}
-                                    onChange={(e) =>
-                                        setTotalResultsYear(
-                                            (Number(e.target.value) > 0
-                                                ? Number(e.target.value)
-                                                : 0) || 0
-                                        )
-                                    }
-                                    min={1}
-                                    className="p-2 border-b-2 text-center"
-                                />
-                            </div>
-
-                            <table className="min-w-full bg-white border rounded-xl border-gray-300 border-separate">
-                                <tbody className="text-md text-center font-light">
-                                    <tr className="border-b border-gray-300 rounded-tl-xl text-lg hover:bg-[#BBE1FA] hover:shadow-md hover:text-xl transition-all duration-300 ease-in-out">
-                                        <td className="py-3 px-6 rounded-tl-xl">
-                                            Total Balance
-                                        </td>
-                                        <td className="py-3 px-6 rounded-tr-xl">
-                                            {toCurrency}{" "}
-                                            {yearlyBalanceAfterTaxAndFees[
-                                                totalResultsYear - 1
-                                            ]
-                                                ? Number(
-                                                      yearlyBalanceAfterTaxAndFees[
-                                                          totalResultsYear - 1
-                                                      ]
-                                                  ).toFixed(2)
-                                                : 0}
-                                        </td>
-                                    </tr>
-                                    <tr className="border-b border-gray-300 rounded-tl-xl hover:bg-[#BBE1FA] hover:shadow-md hover:text-lg transition-all duration-300 ease-in-out">
-                                        <td className="py-3 px-6 rounded-tl-xl">
-                                            Total Profits
-                                        </td>
-                                        <td className="py-3 px-6 rounded-tr-xl">
-                                            {toCurrency}{" "}
-                                            {yearlyBalanceAfterTaxAndFees[
-                                                totalResultsYear - 1
-                                            ]
-                                                ? (
-                                                      Number(
-                                                          yearlyBalanceAfterTaxAndFees[
-                                                              totalResultsYear -
-                                                                  1
-                                                          ]
-                                                      ) -
-                                                      (yearlyBalanceAfterTaxAndFees[
-                                                          totalResultsYear - 2
-                                                      ]
-                                                          ? yearlyBalanceAfterTaxAndFees[
-                                                                totalResultsYear -
-                                                                    2
-                                                            ]
-                                                          : initialInvestment)
-                                                  ).toFixed(2)
-                                                : 0}
-                                        </td>
-                                    </tr>
-                                    <tr className="border-b border-gray-300 hover:bg-[#BBE1FA] hover:shadow-md hover:text-lg transition-all duration-300 ease-in-out">
-                                        <td className="py-3 px-6">
-                                            Total Fees
-                                        </td>
-                                        <td className="py-3 px-6">
-                                            {toCurrency}{" "}
-                                            {yearlyFees[totalResultsYear - 1]
-                                                ? Number(
-                                                      yearlyFees[
-                                                          totalResultsYear - 1
-                                                      ]
-                                                  ).toFixed(2)
-                                                : 0}
-                                        </td>
-                                    </tr>
-                                    <tr className="border-b border-gray-300 hover:bg-[#BBE1FA] hover:shadow-md hover:text-lg transition-all duration-300 ease-in-out">
-                                        <td className="py-3 px-6">
-                                            Total Taxes
-                                        </td>
-                                        <td className="py-3 px-6 rounded-br-xl">
-                                            {toCurrency}{" "}
-                                            {yearlyTaxes[totalResultsYear - 1]
-                                                ? Number(
-                                                      yearlyTaxes[
-                                                          totalResultsYear - 1
-                                                      ]
-                                                  ).toFixed(2)
-                                                : 0}
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                <InvestmentResults
+                    setCalculatedYears={setCalculatedYears}
+                    calculatedYears={calculatedYears}
+                    yearlyBalanceAfterTaxAndFees={yearlyBalanceAfterTaxAndFees}
+                    totalResultsYear={totalResultsYear}
+                    setTotalResultsYear={setTotalResultsYear}
+                    toCurrency={toCurrency}
+                    yearlyFees={yearlyFees}
+                    yearlyTaxes={yearlyTaxes}
+                    initialInvestment={initialInvestment}
+                />
             </div>
         </div>
     );

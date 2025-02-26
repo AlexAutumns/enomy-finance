@@ -6,7 +6,7 @@ const calculateInvestmentPlan = (
     selectedInvestment, // Fees and Taxes
     initialInvestment = 0,
     monthlyInvestment = 0,
-    years = 10,
+    years = 30,
     yearlyInvestment = 0 // Might be implemented in the future
 ) => {
     // Extracting data from selectedInvestment
@@ -44,35 +44,29 @@ const calculateInvestmentPlan = (
             // Save Balance before tax and fees
             yearlyBalancesBeforeTaxAndFees.push(currentBalance.toFixed(4));
 
-            // Applying Fees
+            // Apply Fees
             currentBalance -= totalFees;
 
-            // Calculate Taxable Profit
-
+            // Calculate taxable profit correctly
             taxableProfit = currentBalance - previousBalance;
-
-            // Calculate Taxes based on provided tax conditions
             let yearlyTax = 0;
-
-            // Check if taxableProfit is within the range of the current tax bracket
-            if (taxableProfit.toFixed(4) >= 12000) {
-                yearlyTax += taxableProfit * (10 / 100);
-                console.log("yearlyTax:", yearlyTax);
-                // Break the loop once the tax is applied
+            const reversedTaxesArray = taxes.slice().reverse();
+            for (let tax in reversedTaxesArray) {
+                if (taxableProfit >= tax.threshold) {
+                    yearlyTax = taxableProfit * (tax.rate / 100);
+                }
             }
 
+            // Save Taxes
             yearlyTaxes.push(yearlyTax);
 
-            // Applying Taxes
+            // Apply Taxes
             currentBalance -= yearlyTax;
 
             // Save Balance after tax and fees
             yearlyBalancesAfterTaxAndFees.push(currentBalance.toFixed(4));
 
             previousBalance = currentBalance;
-
-            // totalInvestment += yearlyInvestment;
-            // currentBalance += yearlyInvestment;
         }
 
         return {
