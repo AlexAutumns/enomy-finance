@@ -1,14 +1,25 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+
+import axios from "~/utils/axios/axiosConfig.js";
+
+import type { Route } from "./+types/InvestmentPlanCalculator";
 
 import InvestmentInputs from "./InvestmentInputs.tsx";
 import InvestmentResults from "./InvestmentResults.tsx";
 
-import calculateCurrencyConversion from "../../../components/calculation/CalculateCurrencyConversion.js";
-import calculateInvestmentPlan from "../../../components/calculation/InvestmentPlanCalculator/calculateInvestmentPlan.js";
+import calculateCurrencyConversion from "../../../utils/calculation/CalculateCurrencyConversion.js";
+import calculateInvestmentPlan from "../../../utils/calculation/investment_plan_calculator/CalculateInvestmentPlan.js";
 import { data } from "react-router";
 
-const InvestmentPlanCalculator = () => {
+export async function loader({ params }: Route.LoaderArgs) {
+    const isLoggedIn = params.isLoggedIn ? params.isLoggedIn : false;
+
+    return { isLoggedIn };
+}
+
+export async function action() {}
+
+const InvestmentPlanCalculator = ({ loaderData }: Route.ComponentProps) => {
     const investmentsData = [
         {
             name: "Basic Savings",
@@ -57,9 +68,8 @@ const InvestmentPlanCalculator = () => {
 
     const fetchCurrencies = async () => {
         try {
-            const response = await axios.get(
-                "http://localhost:8080/currencies"
-            );
+            console.log("Axios baseURL:", axios.defaults.baseURL); // Log baseURL to check if it's correct
+            const response = await axios.get("/currencies");
             setCurrencies(response.data);
             console.log(response.data);
         } catch (error) {
@@ -119,7 +129,10 @@ const InvestmentPlanCalculator = () => {
         try {
             let result = {};
             // Always use 10 years if totalResultsYear is less than or equal to 10
-            const yearsToUse = totalResultsYear <= calculatedYears ? calculatedYears : totalResultsYear;
+            const yearsToUse =
+                totalResultsYear <= calculatedYears
+                    ? calculatedYears
+                    : totalResultsYear;
             result = calculateInvestmentPlan(
                 currencies,
                 toCurrency,
@@ -340,7 +353,7 @@ const InvestmentPlanCalculator = () => {
                                     <tr className="p-0 not-first:uppercase rounded-tl-2xl rounded-tr-2xl">
                                         <th
                                             className="py-3 px-6 text-center w-full rounded-tl-2xl rounded-tr-2xl bg-gray-200 "
-                                            colspan="2"
+                                            colSpan="2"
                                         >
                                             Overview
                                         </th>
@@ -411,9 +424,15 @@ const InvestmentPlanCalculator = () => {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="flex w-full justify-evenly mt-4 px-4">
+                    <div
+                        className={`flex w-full items-center mt-4 px-4 ${
+                            loaderData.isLoggedIn
+                                ? "justify-evenly"
+                                : "justify-center"
+                        }`}
+                    >
                         <button
-                            className="bg-gray-500 hover:bg-gray-700 text-white py-2 px-4 rounded-full w-1/4"
+                            className="bg-gray-500 hover:bg-gray-700 text-white py-2 px-4 rounded-full w-1/4 transition-all duration-300 ease-in-out"
                             onClick={() => {
                                 setTotalResultsYear(1);
                                 setCalculatedYears(30);
@@ -424,12 +443,16 @@ const InvestmentPlanCalculator = () => {
                         </button>
 
                         {/* Save Button (This should only be loaded in if logged in*/}
-                        <button
-                            className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded-full w-1/4"
-                            onClick={() => {}}
-                        >
-                            Save
-                        </button>
+                        {loaderData.isLoggedIn ? (
+                            <button
+                                className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded-full w-1/4"
+                                onClick={() => {}}
+                            >
+                                Save
+                            </button>
+                        ) : (
+                            <div></div>
+                        )}
                     </div>
                 </div>
 

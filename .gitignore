@@ -1,0 +1,51 @@
+# macOS system files
+.DS_Store
+
+# Node.js modules (frontend)
+node_modules/
+
+# React build files (frontend)
+build/
+
+# React Router specific
+/.react-router/
+
+# Environment variables files (both frontend and backend)
+.env
+
+# Vite specific (frontend)
+.vite/
+
+# Logs
+*.log
+
+# IDEs and editors (common for both frontend and backend)
+.vscode/
+.idea/
+
+# Spring Boot (Java backend)
+
+/target/                # Maven build output
+/.mvn/                  # Maven wrapper
+/.idea/                 # IntelliJ IDEA project files
+*.iml                   # IntelliJ module files
+
+# Java specific
+*.class                 # Compiled Java files
+*.jar                   # JAR files
+*.war                   # WAR files
+
+# Maven wrapper
+mvnw
+mvnw.cmd
+
+# Docker related
+.dockerignore
+Dockerfile
+
+# Temporary files
+*.swp
+*.swo
+
+# npm package-lock files (optional, you can choose to commit them)
+package-lock.json

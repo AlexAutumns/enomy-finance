@@ -17,7 +17,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByAccountStatus(String status);
     boolean existsByEmail(String email);
     void deleteByEmail(String email);
-    List<User> findByNameContainingIgnoreCase(String name);
+    List<User> findByName(String name);
+    Optional<User> findByUsername(String username);
+
 
     @Query("SELECT u FROM User u WHERE u.userId IN :ids")
     List<User> findUsersBySystemSettings(@Param("ids") List<Long> activeSystemSettingsIDs);

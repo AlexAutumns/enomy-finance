@@ -1,16 +1,29 @@
-import { type RouteConfig, index, route } from "@react-router/dev/routes";
+import {
+    type RouteConfig,
+    index,
+    route,
+    layout,
+} from "@react-router/dev/routes";
 
 export default [
     // Home & Dashboard
     index("routes/home.tsx"),
-    route("dashboard", "routes/dashboard.tsx"), // Must be logged in to access
 
     // Authentication Pages
-    route("login", "routes/authentication_pages/login.tsx"),
-    route("register", "routes/authentication_pages/register.tsx"),
+    route("login", "routes/authentication_pages/Login.tsx"),
+    route("signup", "routes/authentication_pages/Register.tsx"),
+    route("logout", "routes/authentication_pages/Logout.tsx"),
 
-    // User Pages
-    route("profile", "routes/user_pages/Profile.tsx"),
+    // Dashboard, Personal Info, Transactions, Settings
+    layout("routes/user_pages/User.tsx", [
+        route("dashboard", "routes/user_pages/Dashboard.tsx"),
+        route("profile", "routes/user_pages/Profile.tsx"),
+        route("portfolio", "routes/user_pages/Portfolio.tsx"),
+        route(
+            "transactions",
+            "routes/financial_management_pages/Transactions.tsx"
+        ),
+    ]),
 
     // Financial Management Pages
     route(
@@ -18,9 +31,7 @@ export default [
         "routes/financial_management_pages/CurrencyConverter.tsx"
     ),
     route(
-        "investment-plan-calculator",
+        "investment-plan-calculator/:isLoggedIn",
         "routes/financial_management_pages/investment_plan_calculator/InvestmentPlanCalculator.tsx"
     ),
-
-    // Settings
 ] satisfies RouteConfig;

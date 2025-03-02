@@ -6,6 +6,8 @@ import com.enomyfinance.system.repository.*;
 import com.enomyfinance.system.controller.*;
 
 import com.enomyfinance.system.service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -30,9 +32,17 @@ public class UserController {
     }
 
     @PostMapping("/add")
-    public User createUser(@RequestBody User user) {
-        return userService.createUser(user);
+    public ResponseEntity<User> newUser(@RequestBody User user) {
+
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
+            System.out.println("Error: Password is null or empty!");
+            return ResponseEntity.badRequest().body(null);
+        }
+
+        User newUser = userService.addUser(user);
+        return ResponseEntity.status(HttpStatus.CREATED).body(newUser);
     }
+
 
     @DeleteMapping("/{id}")
     public void deleteUser(@PathVariable Long id) {

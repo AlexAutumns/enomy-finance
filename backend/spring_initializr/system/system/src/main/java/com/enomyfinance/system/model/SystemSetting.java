@@ -19,4 +19,7 @@ public class SystemSetting {
     private Long settingId;
     private String settingName;
     private String value;
+
+    @ManyToMany(mappedBy = "activeSystemSettings")
+    private List<User> users;
 }

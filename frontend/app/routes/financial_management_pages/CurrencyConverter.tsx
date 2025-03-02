@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-import calculateCurrencyConversion from "../../components/calculation/CalculateCurrencyConversion.js";
+import axios from "~/utils/axios/axiosConfig.js";
+import calculateCurrencyConversion from "../../utils/calculation/CalculateCurrencyConversion.js";
 import { FaExchangeAlt } from "react-icons/fa";
 
 const CurrencyConverter = () => {
@@ -14,7 +14,7 @@ const CurrencyConverter = () => {
         const fetchCurrencies = async () => {
             try {
                 const response = await axios.get(
-                    "http://localhost:8080/currencies"
+                    "/currencies"
                 );
                 setCurrencies(response.data);
             } catch (error) {
