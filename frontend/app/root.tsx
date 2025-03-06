@@ -14,8 +14,7 @@ import type { Route } from "./+types/root";
 import "./app.css";
 
 import BackToTop from "./routes/navigation/BackToTop";
-
-import { FaUser } from "react-icons/fa";
+import Navbar from "./routes/navigation/Navbar";
 
 export const links: Route.LinksFunction = () => [
     { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -39,6 +38,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
                     name="viewport"
                     content="width=device-width, initial-scale=1"
                 />
+                <title>Enomy Finance</title>
                 <Meta />
                 <Links />
             </head>
@@ -52,81 +52,15 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-    const [loggedUser, setLoggedUser] = useState(null)
-
-    const buttonClass =
-        "py-2 px-4 rounded-full transition duration-300 ease-in-out";
-    const primaryStyle =
-        "bg-[#3282B8] text-white hover:bg-[#BBE1FA] hover:text-[#3282B8]";
-    const navLinkClass =
-        "hover:text-[#BBE1FA] transition duration-300 ease-in-out";
-
-    const navItems = [
-        { path: "/", label: "Home" },
-        { path: "/currency-converter", label: "Currency Converter" },
-        {
-            path: `/investment-plan-calculator/${isLoggedIn}`,
-            label: "Investment Plan Calculator",
-        },
-    ];
-
     return (
         <div className="h-full">
-            {/* Navigation Bar */}
-            <nav className="sticky top-0 w-full flex justify-between items-center p-4 bg-gray-800 text-white shadow-lg">
-                <NavLink
-                    to="/"
-                    className="flex items-center text-3xl font-bold"
-                >
-                    <span className="text-[#3282B8]">Enomy</span>
-                    <span className="text-[#BBE1FA] font-SpaceGrotesk">
-                        Finance
-                    </span>
-                </NavLink>
-                <div className="flex items-center space-x-10">
-                    <ul className="flex space-x-5">
-                        {navItems.map(({ path, label }) => (
-                            <li key={path}>
-                                <NavLink to={path} className={navLinkClass}>
-                                    {label}
-                                </NavLink>
-                            </li>
-                        ))}
-                        {isLoggedIn && (
-                            <li>
-                                <NavLink
-                                    to="/dashboard/transactions"
-                                    className={navLinkClass}
-                                >
-                                    Transactions
-                                </NavLink>
-                            </li>
-                        )}
-                    </ul>
-                    <div className="flex space-x-5">
-                        {!isLoggedIn ? (
-                            <NavLink
-                                to="/signup"
-                                className={`${buttonClass} ${primaryStyle}`}
-                            >
-                                Sign Up
-                            </NavLink>
-                        ) : (
-                            <NavLink
-                                to="/profile"
-                                className={`${buttonClass} ${primaryStyle}`}
-                            >
-                                <FaUser />
-                            </NavLink>
-                        )}
-                    </div>
-                </div>
-            </nav>
+            {/* Navigation Bar*/}
+            <Navbar />
 
             {/* Output of Routes */}
-            <Outlet />
+            <div className="min-h-screen bg-gradient-to-br from-[#EEEEEE] to-[#BBE1FA]">
+                <Outlet />
+            </div>
 
             {/* Back To Top Button */}
             <BackToTop />

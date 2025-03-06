@@ -182,10 +182,10 @@ const InvestmentResults = ({
             <h2 className="font-bold mb-2 text-2xl pb-2 w-full text-center">
                 Results
             </h2>
-            <div className="flex h-full flex-col items-center border-2 rounded-2xl p-4 gap-6 shadow-xl">
-                <div className="flex flex-col w-full justify-center">
+            <div className="flex h-full flex-col items-center border-2 rounded-2xl p-4 gap-6 shadow-xl bg-white">
+                <div className="flex flex-col w-full justify-center gap-5">
                     {/* Result Chart */}
-                    <div className="w-full h-[40%] flex justify-center items-center text-center">
+                    <div className="w-full h-[40%] flex justify-center items-center text-center rounded-2xl p-4">
                         <LineChart
                             chartData={{
                                 labels: intervalSeries,

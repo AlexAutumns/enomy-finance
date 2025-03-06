@@ -11,8 +11,8 @@ export type Info = {
   parents: [Parent0],
   id: "routes/financial_management_pages/investment_plan_calculator/InvestmentPlanCalculator"
   file: "routes/financial_management_pages/investment_plan_calculator/InvestmentPlanCalculator.tsx"
-  path: "investment-plan-calculator/:isLoggedIn"
-  params: {"isLoggedIn": string} & { [key: string]: string | undefined }
+  path: "investment-plan-calculator"
+  params: {} & { [key: string]: string | undefined }
   module: Module
   loaderData: T.CreateLoaderData<Module>
   actionData: T.CreateActionData<Module>

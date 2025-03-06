@@ -22,9 +22,6 @@ public class Investment {
     private String currencyCode;
     private Double initialLumpSum;
     private Double monthlyInvestment;
-    private Double[] yearlyFees;
-    private Double[] yearlyTaxes;
-    private Double expectedMaxReturn;
     private LocalDateTime timestamp;
 
     @ManyToOne

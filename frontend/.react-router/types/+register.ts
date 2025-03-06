@@ -9,14 +9,12 @@ declare module "react-router" {
 type Params = {
   "/": {};
   "/login": {};
-  "/signup": {};
   "/logout": {};
+  "/signup": {};
   "/dashboard": {};
   "/profile": {};
   "/portfolio": {};
   "/transactions": {};
   "/currency-converter": {};
-  "/investment-plan-calculator/:isLoggedIn": {
-    "isLoggedIn": string;
-  };
+  "/investment-plan-calculator": {};
 };

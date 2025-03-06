@@ -11,8 +11,9 @@ export default [
 
     // Authentication Pages
     route("login", "routes/authentication_pages/Login.tsx"),
-    route("signup", "routes/authentication_pages/Register.tsx"),
     route("logout", "routes/authentication_pages/Logout.tsx"),
+
+    route("signup", "routes/authentication_pages/Register.tsx"),
 
     // Dashboard, Personal Info, Transactions, Settings
     layout("routes/user_pages/User.tsx", [
@@ -31,7 +32,7 @@ export default [
         "routes/financial_management_pages/CurrencyConverter.tsx"
     ),
     route(
-        "investment-plan-calculator/:isLoggedIn",
+        "investment-plan-calculator",
         "routes/financial_management_pages/investment_plan_calculator/InvestmentPlanCalculator.tsx"
     ),
 ] satisfies RouteConfig;
