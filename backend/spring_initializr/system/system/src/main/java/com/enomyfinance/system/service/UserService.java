@@ -1,10 +1,12 @@
 package com.enomyfinance.system.service;
 
 import com.enomyfinance.system.model.*;
-import com.enomyfinance.system.service.*;
 import com.enomyfinance.system.repository.*;
-import com.enomyfinance.system.controller.*;
-
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,9 @@ import java.util.Optional;
 public class UserService {
     @Autowired
     private final UserRepository userRepository;
+
+    @Autowired
+    private AuthenticationManager authenticationManager;
 
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
@@ -42,8 +47,6 @@ public class UserService {
         return userRepository.save(user);
     }
 
-
-
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
@@ -58,5 +61,20 @@ public class UserService {
 
     public List<User> getUsersBySystemSettings(List<Long> activeSystemSettingsIDs) {
         return userRepository.findUsersBySystemSettings(activeSystemSettingsIDs);
+    }
+
+    public Optional<User> getUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    public boolean authenticateUser(String username, String password) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            );
+            return authentication.isAuthenticated();
+        } catch (Exception e) {
+            throw new BadCredentialsException("Invalid username or password", e);
+        }
     }
 }

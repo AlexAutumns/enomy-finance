@@ -8,20 +8,20 @@ import com.enomyfinance.system.controller.*;
 import com.enomyfinance.system.service.InvestmentService;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import java.util.List;
 import java.util.Optional;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/investments")
-@CrossOrigin
+@CrossOrigin(origins ="http://localhost:5173", allowCredentials = "true")
 public class InvestmentController {
     @Autowired
     private InvestmentService investmentService;
 
-    @GetMapping
-    public List<Investment> getAllInvestments() {
-        return investmentService.getAllInvestments();
-    }
+    @Autowired
+    private UserRepository userRepository;  // Add this
 
     @GetMapping("/{id}")
     public Optional<Investment> getInvestmentById(@PathVariable Long id) {
@@ -30,8 +30,19 @@ public class InvestmentController {
 
     @PostMapping("/add")
     public Investment saveInvestment(@RequestBody Investment investment) {
+        if (investment.getUser() == null || investment.getUser().getUserId() == null) {
+            throw new IllegalArgumentException("User ID is required");
+        }
+
+        User user = userRepository.findById(investment.getUser().getUserId())
+                .orElseThrow(() -> new IllegalArgumentException("Invalid User ID"));
+
+        investment.setUser(user); // Assign fetched user
+        investment.setTimestamp(LocalDateTime.now()); // Auto-generate timestamp
+
         return investmentService.saveInvestment(investment);
     }
+
 
     @GetMapping("/user/{userId}")
     public List<Investment> getInvestmentsByUserId(@PathVariable Long userId) {

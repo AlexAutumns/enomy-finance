@@ -15,8 +15,6 @@ export function meta({}: Route.MetaArgs) {
 }
 
 
-
-
 // Home component
 const Home = () => {
     // List of services with their paths and labels
@@ -27,9 +25,12 @@ const Home = () => {
     ];
 
     return (
-        <div className="bg-[#222831] text-[#EEEEEE]">
+        <div className="bg-[#222831] text-[#EEEEEE] h-screen">
             {/* Intro Section */}
-            <section id="intro" className="text-center py-16 bg-[#1B262C]">
+            <section
+                id="intro"
+                className="text-center flex flex-col justify-center items-center py-16 h-[40%] bg-[#1B262C]"
+            >
                 <h2 className="text-4xl font-semibold text-[#BBE1FA] mb-4">
                     Welcome to Enomy Finance
                 </h2>
@@ -41,7 +42,7 @@ const Home = () => {
             {/* Services Section */}
             <section
                 id="services"
-                className="py-16 bg-[#0F4C75] flex flex-col justify-center items-center text-center"
+                className="py-16 bg-[#0F4C75] flex flex-col justify-center items-center text-center h-[60%]"
             >
                 <h2 className="text-3xl font-semibold text-[#EEEEEE] mb-8">
                     Our Services

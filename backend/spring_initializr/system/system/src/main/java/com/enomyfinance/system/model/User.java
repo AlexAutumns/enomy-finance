@@ -24,11 +24,12 @@ public class User {
     private String name;
     private String username;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) // Allows reading password in requests
-    private String password;
-
     private String phone;
     private String role;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private String password;
+
 
     @ManyToMany
     @JoinTable(

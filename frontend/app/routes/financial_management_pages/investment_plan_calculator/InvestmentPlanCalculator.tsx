@@ -1,25 +1,36 @@
 import React, { useState, useEffect } from "react";
 
-import axios from "~/utils/axios/axiosConfig.js";
+import axios from "axios";
+import axiosInstance from "~/utils/axios/axiosConfig.js";
 
 import type { Route } from "./+types/InvestmentPlanCalculator";
 
-import InvestmentInputs from "./InvestmentInputs.tsx";
-import InvestmentResults from "./InvestmentResults.tsx";
+import InvestmentInputs from "./InvestmentInputs";
+import InvestmentResults from "./InvestmentResults";
 
-import calculateCurrencyConversion from "../../../utils/calculation/CalculateCurrencyConversion.js";
-import calculateInvestmentPlan from "../../../utils/calculation/investment_plan_calculator/CalculateInvestmentPlan.js";
+import calculateCurrencyConversion from "../../../utils/calculation/CalculateCurrencyConversion";
+import calculateInvestmentPlan from "../../../utils/calculation/investment_plan_calculator/CalculateInvestmentPlan";
 import { data } from "react-router";
 
-export async function loader({ params }: Route.LoaderArgs) {
-    const isLoggedIn = params.isLoggedIn ? params.isLoggedIn : false;
+const InvestmentPlanCalculator = () => {
+    /* isLoggedIn State */
+    const [isLoggedIn, setIsLoggedIn] = useState(
+        typeof window !== "undefined" &&
+            sessionStorage.getItem("isLoggedIn") === "true"
+    );
 
-    return { isLoggedIn };
-}
+    useEffect(() => {
+        const interval = setInterval(() => {
+            const storedIsLoggedIn =
+                sessionStorage.getItem("isLoggedIn") === "true";
+            if (storedIsLoggedIn !== isLoggedIn) {
+                setIsLoggedIn(storedIsLoggedIn);
+            }
+        }, 1000); // Check every 1000ms
 
-export async function action() {}
+        return () => clearInterval(interval);
+    }, [isLoggedIn]);
 
-const InvestmentPlanCalculator = ({ loaderData }: Route.ComponentProps) => {
     const investmentsData = [
         {
             name: "Basic Savings",
@@ -62,14 +73,15 @@ const InvestmentPlanCalculator = ({ loaderData }: Route.ComponentProps) => {
         },
     ];
 
-    // Currency
+    /* Currency */
     const [currencies, setCurrencies] = useState([]);
     const [toCurrency, setToCurrency] = useState("GBP");
 
     const fetchCurrencies = async () => {
         try {
-            console.log("Axios baseURL:", axios.defaults.baseURL); // Log baseURL to check if it's correct
-            const response = await axios.get("/currencies");
+            const response = await axiosInstance.get(
+                "http://localhost:8080/currencies"
+            );
             setCurrencies(response.data);
             console.log(response.data);
         } catch (error) {
@@ -111,19 +123,9 @@ const InvestmentPlanCalculator = ({ loaderData }: Route.ComponentProps) => {
         setShowDetails((prev) => ({ ...prev, [type]: !prev[type] }));
     };
 
-    useEffect(() => {
-        /** Converting the Currency Used Verification */
-        console.log("Converted Currencies");
-    }, [toCurrency]);
+    /** HANDLE FUNCTIONS */
 
-    useEffect(() => {
-        console.log("Selected Investment Changed");
-    }, [selectedInvestment]);
-
-    useEffect(() => {
-        console.log("Variable Changed");
-    }, [toCurrency, selectedInvestment, initialInvestment, monthlyInvestment]);
-
+    /* Calculation */
     const handleCalculation = () => {
         console.log("Calculating Investment Plan...");
         try {
@@ -159,6 +161,97 @@ const InvestmentPlanCalculator = ({ loaderData }: Route.ComponentProps) => {
             console.error("Error Calculating Investment Plan:", error);
         }
     };
+
+    /* Saving */
+    const handleSave = async () => {
+        console.log("Saving Investment Plan...");
+
+        try {
+            /* Retrieve user ID */
+            const userId = parseInt(sessionStorage.getItem("userId"));
+
+            if (!userId) {
+                const errorMessage =
+                    "Error: User ID is missing. Please log in again.";
+                console.error(errorMessage);
+                return errorMessage;
+            }
+
+            /* Build Payload */
+            const payload = {
+                currencyCode: toCurrency,
+                investmentType: selectedInvestment.type,
+                initialLumpSum: initialInvestment,
+                monthlyInvestment: monthlyInvestment,
+                user: { userId: userId },
+            };
+
+            // Validation checks
+            if (
+                !payload.currencyCode ||
+                !payload.investmentType ||
+                isNaN(payload.initialLumpSum) ||
+                payload.initialLumpSum <= 0 ||
+                isNaN(payload.monthlyInvestment) ||
+                payload.monthlyInvestment < 0
+            ) {
+                const errorMessage =
+                    "Error: Invalid data in the payload. Please check your inputs.";
+                console.error(errorMessage);
+                return errorMessage;
+            }
+
+            console.log("Payload: ", payload);
+
+            /* Data sending logic */
+            const response = await axiosInstance.post(
+                "/investments/add",
+                payload
+            );
+
+            if (response.status === 201 || response.status === 200) {
+                console.log("Investment Plan Saved");
+                return "Investment Plan Saved Successfully!";
+            } else {
+                const errorMessage =
+                    "Something went wrong while saving the investment. Please try again later.";
+                console.error(errorMessage, response);
+                return errorMessage;
+            }
+        } catch (e) {
+            let errorMessage = "Something went wrong, please try again.";
+
+            if (e.response) {
+                // Server responded with a status outside 2xx range
+                errorMessage =
+                    e.response.data?.message ||
+                    `Server error: ${e.response.status}`;
+            } else if (e.request) {
+                // Request was made but no response was received
+                errorMessage =
+                    "No response from server. Please check your internet connection.";
+            } else {
+                // Other errors (e.g., setup issues)
+                errorMessage = `Request failed: ${e.message}`;
+            }
+
+            console.error(errorMessage);
+            return errorMessage;
+        }
+    };
+
+    useEffect(() => {
+        /** Converting the Currency Used Verification */
+        console.log("Converted Currencies");
+    }, [toCurrency]);
+
+    useEffect(() => {
+        console.log("Selected Investment Changed");
+    }, [selectedInvestment]);
+
+    useEffect(() => {
+        console.log("Variable Changed");
+    }, [toCurrency, selectedInvestment, initialInvestment, monthlyInvestment]);
 
     useEffect(() => {
         // Only trigger calculation if totalResultsYear is greater than 10
@@ -280,7 +373,7 @@ const InvestmentPlanCalculator = ({ loaderData }: Route.ComponentProps) => {
                                     onChange={(e) =>
                                         setToCurrency(e.target.value)
                                     }
-                                    className="border-2 p-2 rounded-2xl w-24 text-center w-full"
+                                    className="border-2 p-2 rounded-2xl text-center w-full bg-white"
                                 >
                                     {currencies.map((currency) => (
                                         <option
@@ -315,7 +408,7 @@ const InvestmentPlanCalculator = ({ loaderData }: Route.ComponentProps) => {
                                               )
                                             : 0
                                     }
-                                    className="p-2 border-2 rounded-2xl w-full text-center"
+                                    className="p-2 border-2 rounded-2xl w-full text-center bg-white"
                                 />
                             </div>
 
@@ -341,7 +434,7 @@ const InvestmentPlanCalculator = ({ loaderData }: Route.ComponentProps) => {
                                               )
                                             : 0
                                     }
-                                    className="p-2 border-2 rounded-2xl w-full text-center"
+                                    className="p-2 border-2 rounded-2xl w-full text-center bg-white"
                                 />
                             </div>
                         </div>
@@ -353,7 +446,7 @@ const InvestmentPlanCalculator = ({ loaderData }: Route.ComponentProps) => {
                                     <tr className="p-0 not-first:uppercase rounded-tl-2xl rounded-tr-2xl">
                                         <th
                                             className="py-3 px-6 text-center w-full rounded-tl-2xl rounded-tr-2xl bg-gray-200 "
-                                            colSpan="2"
+                                            colSpan={2}
                                         >
                                             Overview
                                         </th>
@@ -426,9 +519,7 @@ const InvestmentPlanCalculator = ({ loaderData }: Route.ComponentProps) => {
                     {/* Action Buttons */}
                     <div
                         className={`flex w-full items-center mt-4 px-4 ${
-                            loaderData.isLoggedIn
-                                ? "justify-evenly"
-                                : "justify-center"
+                            isLoggedIn ? "justify-evenly" : "justify-center"
                         }`}
                     >
                         <button
@@ -443,10 +534,12 @@ const InvestmentPlanCalculator = ({ loaderData }: Route.ComponentProps) => {
                         </button>
 
                         {/* Save Button (This should only be loaded in if logged in*/}
-                        {loaderData.isLoggedIn ? (
+                        {isLoggedIn ? (
                             <button
                                 className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded-full w-1/4"
-                                onClick={() => {}}
+                                onClick={() => {
+                                    handleSave();
+                                }}
                             >
                                 Save
                             </button>
